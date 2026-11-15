@@ -71,6 +71,14 @@ def test_index_persists_to_a_file(tmp_path: Path):
     assert reopened.count() == 3 and reopened.search("credential", 1)[0]["doc"] == "rotate"
 
 
+def test_index_can_be_searched_from_another_thread(index: core.Index):
+    found = []
+    worker = threading.Thread(target=lambda: found.extend(index.search("credential", 1)))
+    worker.start()
+    worker.join()
+    assert found[0]["doc"] == "rotate"
+
+
 # --- search ------------------------------------------------------------------
 
 

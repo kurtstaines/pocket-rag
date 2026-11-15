@@ -99,7 +99,9 @@ class Index:
 
     def __init__(self, path: str | Path, embedder: Embedder) -> None:
         self.embedder = embedder
-        self.db = sqlite3.connect(str(path))
+        # check_same_thread=False so a web server can search from its worker threads.
+        # Searching is safe to share; serialise calls to add() yourself.
+        self.db = sqlite3.connect(str(path), check_same_thread=False)
         self.db.executescript(
             """
             CREATE TABLE IF NOT EXISTS chunks(
