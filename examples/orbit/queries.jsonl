@@ -1,0 +1,34 @@
+{"query": "What does error E4291 mean?", "relevant": ["rate-limits"], "kind": "exact"}
+{"query": "E4031", "relevant": ["auth-scopes"], "kind": "exact"}
+{"query": "When do I get E4220?", "relevant": ["errors-validation"], "kind": "exact"}
+{"query": "E5040 connection closed", "relevant": ["timeouts"], "kind": "exact"}
+{"query": "Is E5000 safe to retry?", "relevant": ["errors-server"], "kind": "exact"}
+{"query": "X-Orbit-Signature header", "relevant": ["webhooks-signing"], "kind": "exact"}
+{"query": "What is the Idempotency-Key header for?", "relevant": ["idempotency"], "kind": "exact"}
+{"query": "ORBIT_API_KEY environment variable", "relevant": ["sdk-python", "sdk-node"], "kind": "exact"}
+{"query": "next_cursor is null", "relevant": ["pagination"], "kind": "exact"}
+{"query": "Orbit-Version header", "relevant": ["versioning"], "kind": "exact"}
+{"query": "What does the Sunset header tell me?", "relevant": ["deprecation"], "kind": "exact"}
+{"query": "sk_test_ keys", "relevant": ["sandbox"], "kind": "exact"}
+{"query": "job.finished event", "relevant": ["jobs"], "kind": "exact"}
+{"query": "SAML 2.0", "relevant": ["sso"], "kind": "exact"}
+{"query": "Retry-After", "relevant": ["rate-limits"], "kind": "exact"}
+{"query": "How do I swap my credentials without an outage?", "relevant": ["auth-rotation"], "kind": "paraphrase"}
+{"query": "I'm being throttled, how many calls am I allowed?", "relevant": ["rate-limits", "rate-burst"], "kind": "paraphrase"}
+{"query": "How can I be sure a notification really came from you?", "relevant": ["webhooks-signing"], "kind": "paraphrase"}
+{"query": "What happens if my server is down when you try to notify it?", "relevant": ["webhooks-retries"], "kind": "paraphrase"}
+{"query": "How do I avoid charging a customer twice when a request is repeated?", "relevant": ["idempotency"], "kind": "paraphrase"}
+{"query": "My large file transfer got cut off halfway, do I begin again?", "relevant": ["uploads-resume"], "kind": "paraphrase"}
+{"query": "Can I move my account's storage to Europe after signing up?", "relevant": ["regions"], "kind": "paraphrase"}
+{"query": "How long before something I removed is gone for good?", "relevant": ["data-retention"], "kind": "paraphrase"}
+{"query": "How do I get a complete backup of everything we have stored?", "relevant": ["export"], "kind": "paraphrase"}
+{"query": "Is there a safe place to experiment without affecting production?", "relevant": ["sandbox"], "kind": "paraphrase"}
+{"query": "Why doesn't a newly saved item show up when I look for it straight away?", "relevant": ["search-api"], "kind": "paraphrase"}
+{"query": "How do I send many changes in a single call?", "relevant": ["bulk"], "kind": "paraphrase"}
+{"query": "Can staff log in with our corporate accounts?", "relevant": ["sso"], "kind": "paraphrase"}
+{"query": "What happens if we don't pay on time?", "relevant": ["billing"], "kind": "paraphrase"}
+{"query": "Where can I see whether the service is having problems right now?", "relevant": ["status"], "kind": "paraphrase"}
+{"query": "How do I fetch the rest of a long list of results?", "relevant": ["pagination"], "kind": "paraphrase"}
+{"query": "My request takes several minutes, what should I do instead of waiting?", "relevant": ["jobs", "timeouts"], "kind": "paraphrase"}
+{"query": "How much notice do I get before an old release of the interface is switched off?", "relevant": ["deprecation"], "kind": "paraphrase"}
+{"query": "Can I limit what a credential is permitted to do?", "relevant": ["auth-scopes"], "kind": "paraphrase"}
