@@ -8,9 +8,9 @@
 
 **Local retrieval in one SQLite file, with the evaluation that tells you which search mode to trust.**
 
-![Evaluation on the sample corpus](https://raw.githubusercontent.com/kurtstaines/pocket-rag/main/docs/assets/eval.png)
+![Indexing the sample corpus, searching an error code, and building a grounded prompt](https://raw.githubusercontent.com/kurtstaines/pocket-rag/main/docs/screenshots/demo.gif)
 
-*recall@5 and MRR on the 34 labelled sample queries with nomic-embed-text. Hybrid did not come out on top.*
+*A real run: index the sample corpus with the hashing embedder, search error code E4291 by keyword, and build a grounded prompt. No model required.*
 
 Most retrieval demos stop at "it returned something plausible". `pocket-rag` indexes your documents with a local embedding model, searches them three ways (vector, keyword, hybrid), and then measures all three against labelled questions, so the choice of search mode is a number instead of a belief.
 
@@ -18,7 +18,25 @@ The library has no dependencies beyond the Python standard library (the optional
 
 Status: **v0.1, early.** Small on purpose.
 
+## Quickstart
+
+```bash
+git clone https://github.com/kurtstaines/pocket-rag.git
+cd pocket-rag
+pip install -e .
+pocket-rag index orbit.db examples/orbit/docs.jsonl --embedder hashing
+pocket-rag search orbit.db "E4291"
+```
+
+That runs with no model at all. For real embeddings, install Ollama, run `ollama pull nomic-embed-text`, and drop the `--embedder hashing` flag.
+
+The package is not on PyPI. Install it from this repository with the commands above, or with `pip install "git+https://github.com/kurtstaines/pocket-rag.git"`.
+
 ## What the evaluation showed
+
+![Evaluation on the sample corpus](https://raw.githubusercontent.com/kurtstaines/pocket-rag/main/docs/assets/eval.png)
+
+*recall@5 and MRR on the 34 labelled sample queries with nomic-embed-text. Hybrid did not come out on top.*
 
 The repo ships a small sample corpus (30 short documents for a fictional API) and 34 labelled questions: 15 that quote an exact identifier such as an error code or header name, and 19 that paraphrase the answer without sharing its words. Measured with `nomic-embed-text` on a local Ollama:
 
@@ -53,18 +71,6 @@ pocket-rag eval orbit.db examples/orbit/queries.jsonl --by kind
 - **Paragraph-aware chunking** with overlap for oversized paragraphs.
 - **Safe re-indexing.** Adding a document again replaces its old chunks, and an index refuses to be searched with a different embedding model than it was built with.
 - **An offline baseline embedder** (hashed bag of words) for tests and for seeing what a real model adds.
-
-## Quickstart
-
-```bash
-git clone https://github.com/kurtstaines/pocket-rag.git
-cd pocket-rag
-pip install -e .
-pocket-rag index orbit.db examples/orbit/docs.jsonl --embedder hashing
-pocket-rag search orbit.db "E4291"
-```
-
-That runs with no model at all. For real embeddings, install Ollama, run `ollama pull nomic-embed-text`, and drop the `--embedder hashing` flag.
 
 ## Live demo
 
