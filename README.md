@@ -1,10 +1,16 @@
 # pocket-rag
 
+![pocket-rag](https://raw.githubusercontent.com/kurtstaines/pocket-rag/main/docs/assets/banner.png)
+
 [![CI](https://github.com/kurtstaines/pocket-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/kurtstaines/pocket-rag/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kurtstaines/pocket-rag/blob/main/LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 
 **Local retrieval in one SQLite file, with the evaluation that tells you which search mode to trust.**
+
+![Evaluation on the sample corpus](https://raw.githubusercontent.com/kurtstaines/pocket-rag/main/docs/assets/eval.png)
+
+*recall@5 and MRR on the 34 labelled sample queries with nomic-embed-text. Hybrid did not come out on top.*
 
 Most retrieval demos stop at "it returned something plausible". `pocket-rag` indexes your documents with a local embedding model, searches them three ways (vector, keyword, hybrid), and then measures all three against labelled questions, so the choice of search mode is a number instead of a belief.
 
