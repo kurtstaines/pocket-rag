@@ -26,7 +26,7 @@ Homepage = "https://github.com/kurtstaines/pocket-rag"
 Issues = "https://github.com/kurtstaines/pocket-rag/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "anthropic>=2,<3"]
 
 [project.scripts]
 pocket-rag = "pocket_rag.cli:main"

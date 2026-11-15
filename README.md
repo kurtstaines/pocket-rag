@@ -14,7 +14,7 @@
 
 Most retrieval demos stop at "it returned something plausible". `pocket-rag` indexes your documents with a local embedding model, searches them three ways (vector, keyword, hybrid), and then measures all three against labelled questions, so the choice of search mode is a number instead of a belief.
 
-It has no dependencies beyond the Python standard library. Embeddings come from a local [Ollama](https://ollama.com) model, so nothing leaves your machine.
+The library has no dependencies beyond the Python standard library (the optional live demo adds the Anthropic SDK). Embeddings come from a local [Ollama](https://ollama.com) model, so nothing leaves your machine.
 
 Status: **v0.1, early.** Small on purpose.
 
@@ -65,6 +65,16 @@ pocket-rag search orbit.db "E4291"
 ```
 
 That runs with no model at all. For real embeddings, install Ollama, run `ollama pull nomic-embed-text`, and drop the `--embedder hashing` flag.
+
+## Live demo
+
+[`demo/`](https://github.com/kurtstaines/pocket-rag/tree/main/demo) is a small web app on top of the library. A hosted model (Claude Haiku 5.5, through the Anthropic API) is given pocket-rag's keyword search as a tool. It searches the sample corpus, then answers only from the passages it retrieved, with citations. The page shows every search the model made, the response time, the token counts and what the answer cost.
+
+The idea follows from the table above: keyword search misses paraphrased questions, so the model rewrites the question into the terms the documentation uses. How much recall that recovers is not measured yet; it is on the roadmap.
+
+To deploy your own copy, import this repository into [Vercel](https://vercel.com), set the project's root directory to `demo`, and add an `ANTHROPIC_API_KEY` environment variable. `GET /api/ask` is a health check that makes no model call.
+
+The endpoint accepts questions up to 300 characters, allows five a minute per address and caps the total per day. Those limits are held in memory per server instance, so set a spend limit on the API key as the real ceiling.
 
 ## Commands
 
@@ -126,10 +136,11 @@ pip install -e ".[dev]"
 pytest
 ```
 
-19 tests cover chunking, indexing and re-indexing, each search mode, rank fusion, protection against full-text query injection, the evaluation maths, the sample corpus's consistency, both embedders (the Ollama one against a local stub server) and the command line. They run offline; CI does not have Ollama, so the numbers in the table above come from a local run, not from CI.
+26 tests cover chunking, indexing and re-indexing, searching from another thread, each search mode, rank fusion, protection against full-text query injection, the evaluation maths, the sample corpus's consistency, both embedders (the Ollama one against a local stub server), the command line, and the demo endpoint (its tool loop, input checks and rate limits, against a scripted stand-in for the model). They run offline; CI does not have Ollama, so the numbers in the table above come from a local run, not from CI.
 
 ## Roadmap
 
+- Measure the demo's model-rewritten keyword search with the same harness
 - Task prefixes for embedding models that expect them
 - A reranking stage, measured with the same harness
 - Metadata filters

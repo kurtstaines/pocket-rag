@@ -1,0 +1,2 @@
+anthropic>=2,<3
+pocket-rag @ git+https://github.com/kurtstaines/pocket-rag.git@main

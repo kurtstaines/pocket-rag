@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pocket-rag live demo</title>
+<meta name="description" content="Ask the Orbit API docs: keyword retrieval from pocket-rag, answered by a hosted model with citations, latency and cost.">
+<style>
+  :root { --bg:#f7f7f5; --card:#fff; --ink:#1c1d1f; --mute:#666b73; --line:#dedfe2; --accent:#2f5bd8; --code:#eef0f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131417; --card:#1b1d21; --ink:#e8e9ec; --mute:#9aa0aa; --line:#2c2f36; --accent:#8aa7ff; --code:#24272d; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 6px; }
+  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--mute); margin: 24px 0 8px; }
+  p.lede { color: var(--mute); margin: 0 0 24px; }
+  a { color: var(--accent); }
+  form { display:flex; gap:8px; }
+  input { flex:1; min-width:0; padding:12px 14px; font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:8px; }
+  button { font:inherit; cursor:pointer; border-radius:8px; border:1px solid var(--line); background:var(--card); color:inherit; padding:8px 12px; }
+  button.go { background:var(--accent); border-color:var(--accent); color:#fff; padding:12px 18px; }
+  button:disabled { opacity:.6; cursor:default; }
+  .examples { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 0; }
+  .examples button { font-size:.875rem; color:var(--mute); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+  #answer { white-space: pre-wrap; }
+  .metrics { display:flex; flex-wrap:wrap; gap:6px 20px; color:var(--mute); font-size:.875rem; margin-top:12px; font-variant-numeric: tabular-nums; }
+  .metrics b { color:var(--ink); font-weight:600; }
+  ol, ul { margin:0; padding-left:20px; }
+  code { background:var(--code); border-radius:4px; padding:1px 5px; font-size:.875em; }
+  details { border-top:1px solid var(--line); padding:10px 0; }
+  details:first-of-type { border-top:0; }
+  summary { cursor:pointer; font-family: ui-monospace, Consolas, monospace; font-size:.875rem; }
+  details p { color:var(--mute); margin:8px 0 0; white-space:pre-wrap; font-size:.9rem; }
+  .error { color:#c0392b; }
+  footer { color:var(--mute); font-size:.875rem; margin-top:32px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ask the Orbit docs</h1>
+  <p class="lede">A live demo of <a href="https://github.com/kurtstaines/pocket-rag">pocket-rag</a>. A hosted model searches 30 documents for a fictional API with pocket-rag's keyword search, then answers only from what it found, with citations. Every answer shows what it searched for, how long it took and what it cost.</p>
+
+  <form id="form">
+    <input id="q" maxlength="300" placeholder="What happens when I go over the rate limit?" aria-label="Question" required>
+    <button class="go" id="go">Ask</button>
+  </form>
+  <div class="examples" id="examples"></div>
+
+  <section id="result" hidden>
+    <h2>Answer</h2>
+    <div class="card">
+      <div id="answer"></div>
+      <div class="metrics" id="metrics"></div>
+    </div>
+    <h2>What the model searched for</h2>
+    <div class="card"><ol id="searches"></ol></div>
+    <h2>Cited passages</h2>
+    <div class="card" id="sources"></div>
+  </section>
+
+  <footer>The corpus is fictional and small, so this shows the mechanism, not a benchmark. Questions are limited to 300 characters and a few per minute. Source: <a href="https://github.com/kurtstaines/pocket-rag/tree/main/demo">demo/</a>.</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const examples = [
+  "What does error E4291 mean?",
+  "How do I swap a credential without downtime?",
+  "Can I send upload parts out of order?",
+  "What is the weather in Chicago?"
+];
+for (const text of examples) {
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = text;
+  b.onclick = () => { $("q").value = text; $("form").requestSubmit(); };
+  $("examples").append(b);
+}
+const el = (tag, text, cls) => { const e = document.createElement(tag); e.textContent = text; if (cls) e.className = cls; return e; };
+
+$("form").onsubmit = async event => {
+  event.preventDefault();
+  const question = $("q").value.trim();
+  if (!question) return;
+  $("go").disabled = true; $("go").textContent = "Asking…";
+  $("result").hidden = false;
+  $("answer").className = ""; $("answer").textContent = "Searching and answering…";
+  $("metrics").replaceChildren(); $("searches").replaceChildren(); $("sources").replaceChildren();
+  try {
+    const res = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Request failed.");
+    $("answer").textContent = data.answer;
+    for (const [label, value] of [
+      ["Model", data.model],
+      ["Time", (data.latency_ms / 1000).toFixed(1) + " s"],
+      ["Tokens", data.input_tokens + " in, " + data.output_tokens + " out"],
+      ["Cost", "$" + data.cost_usd.toFixed(5)]
+    ]) { const s = el("span", label + " "); s.append(el("b", value)); $("metrics").append(s); }
+    for (const s of data.searches) {
+      const li = el("li", ""); li.append(el("code", s.query), " → " + (s.hits.length ? s.hits.join(", ") : "no match"));
+      $("searches").append(li);
+    }
+    if (!data.searches.length) $("searches").append(el("li", "No search was made."));
+    for (const s of data.sources) {
+      const d = document.createElement("details"); d.append(el("summary", s.id), el("p", s.text)); $("sources").append(d);
+    }
+    if (!data.sources.length) $("sources").append(el("div", "The answer cited no passages."));
+  } catch (err) {
+    $("answer").className = "error"; $("answer").textContent = err.message;
+  } finally {
+    $("go").disabled = false; $("go").textContent = "Ask";
+  }
+};
+</script>
+</body>
+</html>
